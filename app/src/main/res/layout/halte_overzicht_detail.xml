@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/btn_kaartweergave"
+        style="@android:style/Widget.Holo.Button"
+        android:layout_width="200dp"
+        android:layout_height="30dp"
+        android:layout_marginBottom="17dp"
+        android:background="@drawable/circle_button"
+        android:elevation="15dp"
+        android:fadingEdge="horizontal"
+        android:text="@string/btn_weergave_str"
+        android:textAlignment="center"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="bold"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <ListView
+        android:id="@+id/lv_digital_timetable"
+        android:layout_width="wrap_content"
+        android:layout_height="375dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/tv_digital_timetable" />
+
+    <TextView
+        android:id="@+id/tv_digital_timetable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:text="@string/tv_digital_timetable_str"
+        android:textAppearance="@android:style/TextAppearance.Material.SearchResult.Title" />
+
+</RelativeLayout>
