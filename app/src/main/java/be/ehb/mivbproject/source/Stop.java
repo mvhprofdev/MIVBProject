@@ -1,10 +1,12 @@
 package be.ehb.mivbproject.source;
 
+import java.util.ArrayList;
+
 /**
  * Created by mobapp10 on 09/05/17.
  */
 
-public class Stop {
+public class Stop extends ArrayList<Stop> {
     String stop_id, stop_code, stop_name, stop_desc,stop_lat, stop_lon, zone_id, stop_url, location_type;
 
     public Stop(String string) {
@@ -96,4 +98,8 @@ public class Stop {
         this.location_type = location_type;
     }
 
+    @Override
+    public String toString() {
+        return "STOP{" + "stop_name='" + stop_name + '\'' + ", stop_lat='" + stop_lat + '\'' + ", stop_lon='" + stop_lon + '\'' + '}';
+    }
 }

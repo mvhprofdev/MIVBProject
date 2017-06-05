@@ -3,9 +3,11 @@ package be.ehb.mivbproject.fragments;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,10 +31,12 @@ import be.ehb.mivbproject.util.DatabaseDAO;
 
 public class MapFragment extends Fragment {
 
-    private GoogleMap googleMap;
-    private MapView mapView;
+    public final static String DATA_RECEIVE = "data_receive";
     ArrayList<Stop> mStop = new ArrayList<>();
     DatabaseDAO dao;
+    private GoogleMap googleMap;
+    private MapView mapView;
+    private AutoCompleteTextView actvBestemming, actvVertrek;
 
     public MapFragment() {
     }
@@ -42,9 +46,12 @@ public class MapFragment extends Fragment {
         return fragment;
     }
 
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
         mapView = (MapView) rootView.findViewById(R.id.mv_map);
@@ -67,13 +74,11 @@ public class MapFragment extends Fragment {
                 CameraUpdate updateMove = CameraUpdateFactory.newLatLngZoom(belgCoord, 14);
                 googleMap.animateCamera(updateMove);
 
-                googleMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(50.85712, 4.34744))
-                        .title("Marker"));
-
                 drawMarkers();
             }
         });
+
+
 
 
         dao = new DatabaseDAO(getActivity());
@@ -81,6 +86,19 @@ public class MapFragment extends Fragment {
         getAllStopsOnMap();
 
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        /*
+        Bundle args = getArguments();
+        if (args != null) {
+            String vertrek = args.getString(DATA_RECEIVE);
+
+            //Log.d("VERTREKHALTE", String.valueOf(vertrek));
+        }
+        */
     }
 
     @Override
@@ -117,14 +135,54 @@ public class MapFragment extends Fragment {
 
     private void drawMarkers() {
 
-        for (int i = 0; i < mStop.size(); i++) {
-            double lat = Double.parseDouble(mStop.get(i).getStop_lat());
-            double lon = Double.parseDouble(mStop.get(i).getStop_lon());
-            LatLng coord = new LatLng(lat, lon);
+        Bundle args = getArguments();
+        if (args != null) {
+            String vertrek = args.getString(DATA_RECEIVE);
 
-            googleMap.addMarker(new MarkerOptions()
-                    .position(coord)
-                    .title(mStop.get(i).getStop_name()));
+            ArrayList<Stop> mLat = new ArrayList<>();
+            ArrayList<Stop> mLon = new ArrayList<>();
+            //Log.d("VERTREKHALTE", String.valueOf(vertrek));
+
+            mLat = dao.getLatStop(vertrek);
+            mLon = dao.getLonStop(vertrek);
+
+            //Log.d("LAAAAAAAAAAAAT ", mLat.toString());
+            //Log.d("LOOOOOOOOOOOON ", String.valueOf(mLon));
+
+
+            dao = new DatabaseDAO(getActivity());
+            mStop = dao.getDistinctStopNames();
+            //Log.d("AUTOCOMPLETE", String.valueOf(haltes));
+
+            //Log.d("AUTOCOMPLETE","build autocomplete");
+            ArrayList<String> halteNamen = new ArrayList<>();
+            for(Stop temp : mLat){
+                halteNamen.add(temp.getStop_lat());
+                halteNamen.add(temp.getStop_lon());
+
+                Log.d("LAT",temp.getStop_lat());
+                Log.d("LON",temp.getStop_lon());
+
+
+            }
+
+
+
+            for (int i = 0; i < mLat.size(); i++) {
+
+                double lat = Double.parseDouble(mLat.get(i).getStop_lat());
+                double lon = Double.parseDouble(mLon.get(i).getStop_lon());
+                LatLng coord = new LatLng(lat, lon);
+
+                googleMap.addMarker(new MarkerOptions()
+                        .position(coord)
+                        .title(mLat.get(i).getStop_name()));
+
+                Log.d("COORD", String.valueOf(coord));
+
+            }
+
         }
+
     }
 }

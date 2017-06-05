@@ -1,13 +1,11 @@
 package be.ehb.mivbproject.fragments;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.app.TimePickerDialog;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,23 +13,19 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.TimePicker;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import be.ehb.mivbproject.R;
 import be.ehb.mivbproject.source.Stop;
 import be.ehb.mivbproject.util.DatabaseDAO;
-import be.ehb.mivbproject.util.SQLiteHelper;
 
 
 /**
@@ -55,10 +49,26 @@ public class ZoekenFragment extends Fragment {
     ArrayList<Stop> haltes;
     DatabaseDAO dao;
 
-
-
     GoogleMap mMap;
     ArrayList<Stop> mStop = new ArrayList<>();
+
+    DataPassListener mCallback;
+
+    public interface DataPassListener {
+        public void passData(String data);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        // Make sure that container activity implement the callback interface
+        try {
+            mCallback = (DataPassListener)activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement DataPassListener");
+        }
+    }
 
     public ZoekenFragment() {
     }
@@ -76,7 +86,7 @@ public class ZoekenFragment extends Fragment {
         //Log.d("AUTOCOMPLETE","build autocomplete");
         ArrayList<String> halteNamen = new ArrayList<>();
         for(Stop temp : haltes){
-            halteNamen.add(temp.getStop_name().replace("\"",""));
+            halteNamen.add(temp.getStop_name());
             //Log.d("AUTOCOMPLETE",temp.getStop_name());
         }
 
@@ -109,7 +119,8 @@ public class ZoekenFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.content_main, container, false);
 
         actvBestemming = (AutoCompleteTextView) rootView.findViewById(R.id.et_bestemming);
@@ -134,13 +145,10 @@ public class ZoekenFragment extends Fragment {
         });
 
         btnZoeken = (Button) rootView.findViewById(R.id.btn_zoeken);
-
         btnZoeken.setOnClickListener(zoeken);
 
         geefVertrekHalte();
         geefAankomstHalte();
-
-
 
 
         return rootView;
@@ -201,28 +209,28 @@ public class ZoekenFragment extends Fragment {
         return stf.format(calendar.getTime());
     }
 
+
     View.OnClickListener zoeken = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
-            getActivity().getFragmentManager().beginTransaction()
-                    .replace(R.id.container, RouteListFragment.newInstance())
-                    .addToBackStack(FRAGMENT_BACKSTACK)
-                    .commit();
-
-
-
             String vertrek = actvVertrek.getText().toString();
 
+            if (v.getId() == R.id.btn_zoeken) {
+                mCallback.passData(vertrek);
+            }
+            /*
+            getActivity().getFragmentManager().beginTransaction()
+                    .replace(R.id.container, MapFragment.newInstance())
+                    .addToBackStack(FRAGMENT_BACKSTACK)
+                    .commit();
+            */
 
-            //SELECT * FROM stops WHERE stop_name=vertrek;
+            //Log.d("HALTENAAM IN HET TEKSTV",String.valueOf(vertrek));
 
-            Log.d("HALTENAAM IN HET TEKSTV",String.valueOf(vertrek));
-            //Log.d("_ID HALTENAMEN",Integer.toString(vertrekId));
+            //Log.d("LAAAAAAAAAAAAAAAT",String.valueOf(dao.getLatStop(vertrek)));
 
-            Log.d("LAAAAAAAAAAAAAAAT",String.valueOf(dao.getLatStop()));
-
-            Log.d("LOOOOOOOOOOOOOOON",String.valueOf(dao.getLonStop()));
+            //Log.d("LOOOOOOOOOOOOOOON",String.valueOf(dao.getLonStop(vertrek)));
 
 
         }

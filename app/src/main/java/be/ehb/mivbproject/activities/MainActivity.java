@@ -1,5 +1,6 @@
 package be.ehb.mivbproject.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -53,7 +54,7 @@ import be.ehb.mivbproject.util.DatabaseDAO;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        ActivityCompat.OnRequestPermissionsResultCallback {
+        ActivityCompat.OnRequestPermissionsResultCallback, ZoekenFragment.DataPassListener {
 
     ArrayList<Stop> mStopList = new ArrayList<>();
     private SharedPreferences sharedPreferences;
@@ -86,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(sharedPreferences.getBoolean("first", true)) {
             downloadZIP();
         }
+
+
 
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, zoekenFragment)
@@ -180,8 +183,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     private void downloadZIP() {
-
-
         RequestQueue mQueue = Volley.newRequestQueue(getApplicationContext());
         //params voor header
         HashMap<String, String> params = new HashMap<>();
@@ -323,4 +324,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    @Override
+    public void passData(String data) {
+        MapFragment mapFragment = new MapFragment ();
+        Bundle args = new Bundle();
+        args.putString(MapFragment.DATA_RECEIVE, data);
+        mapFragment .setArguments(args);
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, mapFragment )
+                .commit();
+    }
 }
